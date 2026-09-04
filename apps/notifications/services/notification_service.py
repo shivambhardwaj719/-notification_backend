@@ -52,35 +52,50 @@ class NotificationService:
             )
 
             recipient = None
-            if channel == ChannelChoices.WHATSAPP:
-                recipient = ctx.get("phone") or getattr(user, "phone", None) or getattr(user, "username", "mock_phone")
-                send_whatsapp_notification.delay(
-                    delivery_id=delivery.id,
-                    recipient=recipient,
-                    body=rendered_body,
-                    context=ctx
-                )
-            elif channel == ChannelChoices.EMAIL:
-                recipient = ctx.get("user_email") or getattr(user, "email", "test@example.com")
-                send_email_notification.delay(
-                    delivery_id=delivery.id,
-                    recipient=recipient,
-                    body=rendered_body,
-                    subject=rendered_subject,
-                    context=ctx
-                )
-            elif channel == ChannelChoices.WEB_PUSH:
-                sub = None
-                if user:
-                    sub = WebPushSubscription.objects.filter(user=user, is_active=True).first()
-                recipient = sub.player_id if sub else (ctx.get("player_id") or "mock_player_id")
-                send_webpush_notification.delay(
-                    delivery_id=delivery.id,
-                    recipient=recipient,
-                    body=rendered_body,
-                    title=rendered_title,
-                    context=ctx
-                )
+            try:
+                if channel == ChannelChoices.WHATSAPP:
+                    recipient = ctx.get("phone") or getattr(user, "phone", None) or getattr(user, "username", "mock_phone")
+                    send_whatsapp_notification.delay(
+                        delivery_id=delivery.id,
+                        recipient=recipient,
+                        body=rendered_body,
+                        context=ctx
+                    )
+                elif channel == ChannelChoices.EMAIL:
+                    recipient = ctx.get("user_email") or getattr(user, "email", "test@example.com")
+                    send_email_notification.delay(
+                        delivery_id=delivery.id,
+                        recipient=recipient,
+                        body=rendered_body,
+                        subject=rendered_subject,
+                        context=ctx
+                    )
+                elif channel == ChannelChoices.WEB_PUSH:
+                    sub = None
+                    if user:
+                        sub = WebPushSubscription.objects.filter(user=user, is_active=True).first()
+                    recipient = sub.player_id if sub else (ctx.get("player_id") or "mock_player_id")
+                    send_webpush_notification.delay(
+                        delivery_id=delivery.id,
+                        recipient=recipient,
+                        body=rendered_body,
+                        title=rendered_title,
+                        context=ctx
+                    )
+            except Exception as task_err:
+                # If Celery/Redis is down, run synchronously
+                try:
+                    if channel == ChannelChoices.WHATSAPP:
+                        send_whatsapp_notification(delivery.id, recipient, rendered_body, ctx)
+                    elif channel == ChannelChoices.EMAIL:
+                        send_email_notification(delivery.id, recipient, rendered_body, rendered_subject, ctx)
+                    elif channel == ChannelChoices.WEB_PUSH:
+                        send_webpush_notification(delivery.id, recipient, rendered_body, rendered_title, ctx)
+                except Exception:
+                    delivery.status = DeliveryStatusChoices.FAILED
+                    delivery.error_message = str(task_err)
+                    delivery.save()
+
 
             results.append({
                 "channel": channel,

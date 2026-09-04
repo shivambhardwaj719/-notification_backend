@@ -21,16 +21,19 @@ class AuthService:
         }
 
         login_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-        NotificationService.trigger(
-            trigger_code="LOGIN",
-            user=user,
-            context={
-                "user_name": user.get_full_name() or user.username,
-                "user_email": user.email or "",
-                "login_time": login_time,
-                "site_name": "Notification System"
-            }
-        )
+        try:
+            NotificationService.trigger(
+                trigger_code="LOGIN",
+                user=user,
+                context={
+                    "user_name": user.get_full_name() or user.username,
+                    "user_email": user.email or "",
+                    "login_time": login_time,
+                    "site_name": "Notification System"
+                }
+            )
+        except Exception as exc:
+            pass
 
         return True, LOGIN_SUCCESS, {
             "access": str(refresh.access_token),
@@ -42,14 +45,18 @@ class AuthService:
     def logout(cls, user) -> tuple[bool, str]:
         if user and user.is_authenticated:
             logout_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-            NotificationService.trigger(
-                trigger_code="LOGOUT",
-                user=user,
-                context={
-                    "user_name": user.get_full_name() or user.username,
-                    "user_email": user.email or "",
-                    "logout_time": logout_time,
-                    "site_name": "Notification System"
-                }
-            )
+            try:
+                NotificationService.trigger(
+                    trigger_code="LOGOUT",
+                    user=user,
+                    context={
+                        "user_name": user.get_full_name() or user.username,
+                        "user_email": user.email or "",
+                        "logout_time": logout_time,
+                        "site_name": "Notification System"
+                    }
+                )
+            except Exception:
+                pass
         return True, LOGOUT_SUCCESS
+
