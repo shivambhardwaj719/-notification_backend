@@ -1,6 +1,8 @@
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from apps.notifications.permissions import IsAdminUserPermission
+
 from apps.notifications.services.trigger_service import TriggerService
 from apps.notifications.services.template_service import TemplateService
 from apps.notifications.services.delivery_service import DeliveryService
@@ -133,3 +135,60 @@ class DeliveryListView(APIView):
         )
         serializer = NotificationDeliverySerializer(deliveries, many=True)
         return success_response(data=serializer.data, status_code=HTTP_200_OK)
+
+
+from django.http import HttpResponse
+from django.conf import settings
+from apps.notifications.models import NotificationDelivery, DeliveryStatusChoices, ChannelChoices
+
+class WhatsAppWebhookView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        mode = request.query_params.get("hub.mode")
+        token = request.query_params.get("hub.verify_token")
+        challenge = request.query_params.get("hub.challenge")
+
+        verify_token = getattr(settings, "WHATSAPP_VERIFY_TOKEN", "starclinch_whatsapp_verify_token")
+        if mode == "subscribe" and token == verify_token:
+            return HttpResponse(challenge, status=200)
+        return HttpResponse("Verification token mismatch", status=403)
+
+    def post(self, request):
+        data = request.data
+        try:
+            entries = data.get("entry", [])
+            for entry in entries:
+                changes = entry.get("changes", [])
+                for change in changes:
+                    value = change.get("value", {})
+                    statuses = value.get("statuses", [])
+                    for st in statuses:
+                        wamid = st.get("id")
+                        status_str = st.get("status")
+                        recipient_id = st.get("recipient_id")
+                        errors = st.get("errors", [])
+
+                        delivery = None
+                        if wamid:
+                            delivery = NotificationDelivery.objects.filter(provider_message_id=wamid).first()
+                        if not delivery and recipient_id:
+                            delivery = NotificationDelivery.objects.filter(
+                                channel=ChannelChoices.WHATSAPP
+                            ).order_by("-created_at").first()
+
+                        if delivery:
+                            if status_str == "sent":
+                                delivery.status = DeliveryStatusChoices.SENT
+                            elif status_str in ("delivered", "read"):
+                                delivery.status = DeliveryStatusChoices.DELIVERED
+                            elif status_str == "failed":
+                                delivery.status = DeliveryStatusChoices.FAILED
+                                if errors:
+                                    delivery.error_message = f"{errors[0].get('title', 'Failed')}: {errors[0].get('message', '')} (Code: {errors[0].get('code')})"
+                            delivery.save()
+        except Exception as exc:
+            pass
+
+        return success_response(message="Webhook processed successfully", status_code=HTTP_200_OK)
+

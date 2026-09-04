@@ -7,6 +7,7 @@ from apps.notifications.views import (
     TemplateToggleView,
     TemplateTestView,
     DeliveryListView,
+    WhatsAppWebhookView,
 )
 
 urlpatterns = [
@@ -17,4 +18,6 @@ urlpatterns = [
     path("templates/<int:pk>/toggle/", TemplateToggleView.as_view(), name="notification-templates-toggle"),
     path("templates/<int:pk>/test/", TemplateTestView.as_view(), name="notification-templates-test"),
     path("deliveries/", DeliveryListView.as_view(), name="notification-deliveries-list"),
+    path("webhooks/whatsapp/", WhatsAppWebhookView.as_view(), name="whatsapp-webhook"),
 ]
+
