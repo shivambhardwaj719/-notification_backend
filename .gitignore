@@ -1,0 +1,38 @@
+# Python Byte-compiled / Cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Database
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Django Static & Media Files
+/staticfiles/
+/media/
+
+# Celery
+celerybeat-schedule
+*.pid
+
+# IDE & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS Generated Files
+.DS_Store
+Thumbs.db

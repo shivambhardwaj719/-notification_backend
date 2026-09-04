@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: notification-backend-api
+    env: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py seed_triggers"
+
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: DEBUG
+        value: "False"
+
+  - type: worker
+    name: notification-celery-worker
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A config worker --loglevel=info"
+
+databases:
+  - name: notification-db
+    databaseName: notification_system
+    user: admin
