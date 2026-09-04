@@ -119,6 +119,17 @@ SIMPLE_JWT = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://notification-frontend-three.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://notification-frontend-three.vercel.app",
+    "https://*.vercel.app",
+    "https://*.onrender.com",
+]
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -130,6 +141,7 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
+
 
 REDIS_URL = os.getenv("REDIS_URL", os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0"))
 CELERY_BROKER_URL = REDIS_URL
@@ -159,4 +171,5 @@ POSTMARK_FROM_EMAIL = os.getenv("POSTMARK_FROM_EMAIL", DEFAULT_FROM_EMAIL)
 ONESIGNAL_APP_ID = os.getenv("ONESIGNAL_APP_ID", "")
 ONESIGNAL_REST_API_KEY = os.getenv("ONESIGNAL_REST_API_KEY", "")
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://notification-frontend-three.vercel.app")
+
