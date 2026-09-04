@@ -152,18 +152,19 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_ALWAYS_EAGER = os.getenv("CELERY_TASK_ALWAYS_EAGER", "False").lower() in ("true", "1", "t")
 
-WHATSAPP_ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN", "")
-WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "")
+WHATSAPP_ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN", "EAAajgDoAmXgBSV5j95uZA9ZBu7mkyZB8mjy6JOqXGZAvtSqdAwC4I05rGcSnFNJx85kJJw6MJhWp5zDvAzisPa4TpW2akSWXf0mLB6a9RfdfZAz9TCspOnATkb7e24gHBgEJykGdrLblaaEsSxSU8uZA4hGlOtvwZCRZCGsE0fnDJ8K1gRXlT4gGItiGZCZBNoNZC02f0a35SvFFjFbqKdzSMnkscWVDa0WFBrieoA5FyxlP1nKwPjqQK01MFw6ovFnzUIzxpxZCfO9hOUEDkJzCqr8UKDAonGQgWCk1ZCPxsqwZDZD")
+WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "1152382494623224")
 WHATSAPP_API_VERSION = os.getenv("WHATSAPP_API_VERSION", "v18.0")
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ("true", "1", "t")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "shivamtelepathy12@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "xzjaaphwqalnzyba")
 EMAIL_TIMEOUT = 5
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "notifications@example.com")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "shivamtelepathy12@gmail.com")
+
 
 
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "SMTP")
