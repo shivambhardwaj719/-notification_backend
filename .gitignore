@@ -14,10 +14,15 @@ ENV/
 *.sqlite3-journal
 db.sqlite3
 
-# Environment Variables
+# Environment Variables & Secrets
 .env
 .env.local
 .env.*.local
+firebase-credentials.json
+config/firebase-credentials.json
+*credentials*.json
+
+
 
 # Django Static & Media Files
 /staticfiles/
