@@ -89,7 +89,7 @@ class Command(BaseCommand):
             triggers_dict[item["code"]] = t
 
         login_trigger = triggers_dict["LOGIN"]
-        NotificationTemplate.objects.get_or_create(
+        t1, _ = NotificationTemplate.objects.get_or_create(
             trigger=login_trigger,
             channel=ChannelChoices.WHATSAPP,
             defaults={
@@ -101,7 +101,10 @@ class Command(BaseCommand):
                 "variable_mapping": {"vars": ["user_name", "login_time"]}
             }
         )
-        NotificationTemplate.objects.get_or_create(
+        t1.is_enabled = True
+        t1.save()
+
+        t2, _ = NotificationTemplate.objects.get_or_create(
             trigger=login_trigger,
             channel=ChannelChoices.EMAIL,
             defaults={
@@ -113,7 +116,10 @@ class Command(BaseCommand):
                 "variable_mapping": {"vars": ["user_name", "site_name", "login_time"]}
             }
         )
-        NotificationTemplate.objects.get_or_create(
+        t2.is_enabled = True
+        t2.save()
+
+        t3, _ = NotificationTemplate.objects.get_or_create(
             trigger=login_trigger,
             channel=ChannelChoices.WEB_PUSH,
             defaults={
@@ -125,9 +131,11 @@ class Command(BaseCommand):
                 "variable_mapping": {"vars": ["user_name"]}
             }
         )
+        t3.is_enabled = True
+        t3.save()
 
         logout_trigger = triggers_dict["LOGOUT"]
-        NotificationTemplate.objects.get_or_create(
+        t4, _ = NotificationTemplate.objects.get_or_create(
             trigger=logout_trigger,
             channel=ChannelChoices.WHATSAPP,
             defaults={
@@ -139,7 +147,10 @@ class Command(BaseCommand):
                 "variable_mapping": {"vars": ["user_name", "logout_time"]}
             }
         )
-        NotificationTemplate.objects.get_or_create(
+        t4.is_enabled = True
+        t4.save()
+
+        t5, _ = NotificationTemplate.objects.get_or_create(
             trigger=logout_trigger,
             channel=ChannelChoices.EMAIL,
             defaults={
@@ -151,5 +162,8 @@ class Command(BaseCommand):
                 "variable_mapping": {"vars": ["user_name", "logout_time"]}
             }
         )
+        t5.is_enabled = True
+        t5.save()
 
         self.stdout.write(self.style.SUCCESS("Successfully seeded triggers, templates, and users."))
+
