@@ -1,3 +1,5 @@
+import os
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
@@ -5,6 +7,7 @@ from apps.notifications.models import NotificationTrigger, NotificationTemplate,
 from apps.notifications.services.trigger_service import TriggerService
 from apps.notifications.services.template_service import TemplateService
 from apps.notifications.services.variable_service import VariableService
+from apps.notifications.services.webpush_service import WebPushService, _resolve_firebase_credential_path
 from apps.authentication.services.auth_service import AuthService
 
 User = get_user_model()
@@ -92,6 +95,16 @@ class NotificationSystemTests(TestCase):
         )
         self.assertTrue(success)
         self.assertIn("delivery_id", res)
+
+    def test_webpush_credential_resolution(self):
+        resolved_path = _resolve_firebase_credential_path()
+        self.assertTrue(resolved_path)
+        self.assertTrue(os.path.exists(resolved_path))
+        self.assertTrue(resolved_path.endswith("config/firebase-credentials.json"))
+
+        service = WebPushService()
+        response = service.send(recipient="fcm-token-long-enough-for-test-1234567890", content="hello")
+        self.assertTrue(response["success"])
 
     def test_admin_permissions(self):
         self.client.force_authenticate(user=self.user)
